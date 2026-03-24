@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATIZ | AUDITORÍA DE ESTILO</title>
+<style>
+  :root { --bg: #050505; --accent: #00f2ff; --accent-alt: #7000ff; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); --text: #ffffff; }
+  * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+  body { margin: 0; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle at 50% -20%, #1a1a2e, #050505); }
+
+  .container {
+    width: 95%; max-width: 420px; padding: 40px;
+    background: var(--glass); backdrop-filter: blur(25px);
+    border: 1px solid var(--border); border-radius: 40px;
+    position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    min-height: 620px; display: flex; flex-direction: column;
+  }
+
+  .progress-bar { position: absolute; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-alt)); transition: width 0.4s ease; width: 0%; z-index: 10; }
+
+  .step { display: none; opacity: 0; transition: 0.4s; flex-direction: column; }
+  .step.active { display: flex; }
+  .step.visible { opacity: 1; }
+
+  .brand-header { color: var(--accent); font-weight: 800; letter-spacing: 4px; margin-bottom: 5px; font-size: 14px; }
+  h1 { font-size: 36px; font-weight: 900; margin-bottom: 15px; line-height: 1.1; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  h2 { font-size: 19px; font-weight: 600; margin-bottom: 25px; color: #ddd; line-height: 1.4; }
+  
+  .options-grid { display: grid; gap: 12px; }
+  .option-btn {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    padding: 18px; text-align: left; color: #eee; cursor: pointer;
+    border-radius: 20px; font-size: 15px; font-weight: 500; transition: 0.3s;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .option-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); transform: translateY(-2px); }
+
+  .family-name { font-size: 32px; font-weight: 900; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+  .result-card { background: rgba(255,255,255,0.02); border-radius: 28px; padding: 20px; border: 1px solid var(--border); margin: 15px 0; text-align: center; }
+  .res-img { width: 100%; border-radius: 20px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+  .label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-alt); margin-bottom: 8px; font-weight: 800; }
+  .pitch { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px; display: block; line-height: 1.3; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<div class="container" id="main">
+  <div class="step active visible" id="step0">
+    <div class="brand-header">MATIZ</div>
+    <h1>Encuentra tu matiz</h1>
+    <h2>No es solo una pulsera, es el amuleto que define tu energía hoy.</h2>
+    <button class="option-btn" onclick="next(0, 'GO')" style="justify-content:center; background: var(--accent-alt); border:none; font-weight:800; margin-top:30px; color:white;">DESCUBRIR MI ESENCIA</button>
+  </div>
+
+  <div class="step" id="step1">
+    <div class="label-sm">Perfil 01</div>
+    <h2>¿Qué buscas proyectar?</h2>
+    <div class="options-grid">
+      <button class="option-btn" onclick="next(1, 'HILO')">Resistencia y Arte (Tejido)</button>
+      <button class="option-btn" onclick="next(1, 'CUENTAS')">Elegancia y Brillo (Perlas)</button>
+    </div>
+  </div>
+  
+  <div class="step" id="step2">
+    <div class="label-sm">Perfil 02</div>
+    <h2>Tu atmósfera ideal:</h2>
+    <div class="options-grid">
+      <button class="option-btn" onclick="next(2, 'POP')">Impacto Visual</button>
+      <button class="option-btn" onclick="next(2, 'SOFT')">Paz Interior</button>
+      <button class="option-btn" onclick="next(2, 'DARK')">Poder Personal</button>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="label-sm">Perfil 03</div>
+    <h2>Elige tu amuleto:</h2>
+    <div class="options-grid" id="detail-options"></div>
+  </div>
+
+  <div class="step" id="resultStep">
+    <div class="res-container">
+      <div class="label-sm">Familia Seleccionada</div>
+      <div class="family-name" id="res-family"></div>
+      <div class="result-card">
+        <img id="res-image" class="res-img" src="" alt="Tu amuleto">
+        <span class="pitch" id="res-pitch"></span>
+        <p id="res-desc" style="font-size: 14px; opacity: 0.8; line-height: 1.5; color:#ccc;"></p>
+      </div>
+    </div>
+    <button class="option-btn" onclick="location.reload()" style="margin-top:10px; width:100%; justify-content:center; border: 1px solid var(--accent-alt);">REPETIR ANÁLISIS</button>
+  </div>
+</div>
+
+<script>
+  let answers = {};
+  
+  const catalog = {
+    'STARS': { 
+        family: 'Cosmos', 
+        pitch: 'Para la soñadora que conquista el cielo.', 
+        img: 'https://i.postimg.cc/Gm5WWv76/IMG-20260323-WA0035-2.jpg', 
+        desc: 'Las estrellas lila conectan con tu intuición. Úsala como recordatorio de que tu luz propia es capaz de guiarte en cualquier oscuridad.' 
+    },
+    'OCEAN': { 
+        family: 'Zenith', 
+        pitch: 'Para quien domina la calma en la tormenta.', 
+        img: 'https://i.postimg.cc/DwM991jp/IMG-20260323-WA0036-2.jpg', 
+        desc: 'El azul glaciar de estas perlas es un ancla de serenidad. Ideal para mentes enfocadas que buscan equilibrio y autoridad.' 
+    },
+    'CRYSTAL': { 
+        family: 'Vitality', 
+        pitch: 'Para la energía que purifica su entorno.', 
+        img: 'https://i.postimg.cc/RZDkkws8/IMG-20260323-WA0037-2.jpg', 
+        desc: 'Cristales de transparencia total. Una pieza diseñada para personas auténticas, directas y con una vibra imparable.' 
+    },
+    'BLUSH': { 
+        family: 'Aura', 
+        pitch: 'Para la elegancia que no necesita gritar.', 
+        img: 'https://i.postimg.cc/Njz33RCq/IMG-20260323-WA0038-3.jpg', 
+        desc: 'El equilibrio perfecto entre el rosa mate y la pureza del blanco. Resalta tu suavidad natural sin perder el estilo premium.' 
+    },
+    'HEARTS': { 
+        family: 'Esencia', 
+        pitch: 'Para quien sana el mundo con su empatía.', 
+        img: 'https://i.postimg.cc/HkhqqbZR/IMG-20260323-WA0039-2.jpg', 
+        desc: 'Corazones que simbolizan la fuerza del afecto. Es el accesorio ideal para quienes llevan sus sentimientos con orgullo.' 
+    },
+    'RAINBOW': { 
+        family: 'Prisma', 
+        pitch: 'Para la rebeldía que vive a todo color.', 
+        img: 'https://i.postimg.cc/nhPyyqSt/IMG-20260323-WA0040.jpg', 
+        desc: 'Nudos neón que rompen cualquier molde. Esta pulsera es para quienes no temen destacar y viven bajo sus propias reglas.' 
+    },
+    'HERO': { 
+        family: 'Legend', 
+        pitch: 'Para quien lleva el coraje en las venas.', 
+        img: 'https://i.postimg.cc/bwB771CK/IMG-20260323-WA0041-3.jpg', 
+        desc: 'Un símbolo de responsabilidad y fuerza. El tejido negro industrial asegura que tu legado resista cualquier batalla diaria.' 
+    },
+    'PETS': { 
+        family: 'Loyalty', 
+        pitch: 'Para el amor más puro e incondicional.', 
+        img: 'https://i.postimg.cc/cLbppfkG/IMG-20260323-WA0043-2.jpg', 
+        desc: 'La huella es un recordatorio del vínculo inquebrantable con tu compañero. Llévala como símbolo de fidelidad eterna.' 
+    }
+  };
+
+  function next(step, value) {
+    answers[step] = value;
+    document.getElementById('progress').style.width = (step * 33) + '%';
+    document.getElementById('step' + step).classList.remove('active', 'visible');
+    
+    if (step === 2) {
+        renderOptions();
+    } else {
+        const nextStep = document.getElementById('step' + (step + 1));
+        nextStep.classList.add('active');
+        setTimeout(() => nextStep.classList.add('visible'), 50);
+    }
+  }
+
+  function renderOptions() {
+    const grid = document.getElementById('detail-options');
+    grid.innerHTML = '';
+    let opts = [];
+
+    if (answers[1] === 'HILO') {
+        if (answers[2] === 'POP') opts = [{t: 'Espectro Neón', v: 'RAINBOW'}, {t: 'Símbolo de Valor', v: 'HERO'}];
+        else if (answers[2] === 'SOFT') opts = [{t: 'Vínculo Eterno', v: 'PETS'}, {t: 'Fuerza Prisma', v: 'RAINBOW'}];
+        else opts = [{t: 'Instinto Legendario', v: 'HERO'}, {t: 'Nobleza Pura', v: 'PETS'}];
+    } else {
+        if (answers[2] === 'POP') opts = [{t: 'Destello Cosmos', v: 'STARS'}, {t: 'Claridad Vital', v: 'CRYSTAL'}];
+        else if (answers[2] === 'SOFT') opts = [{t: 'Aura Rosada', v: 'BLUSH'}, {t: 'Latido Esencia', v: 'HEARTS'}];
+        else opts = [{t: 'Zenith Glacial', v: 'OCEAN'}, {t: 'Pureza Cristalina', v: 'CRYSTAL'}];
+    }
+
+    opts.forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'option-btn';
+        b.innerText = o.t;
+        b.onclick = () => finish(o.v);
+        grid.appendChild(b);
+    });
+
+    document.getElementById('step3').classList.add('active');
+    setTimeout(() => document.getElementById('step3').classList.add('visible'), 50);
+  }
+
+  function finish(key) {
+    document.getElementById('progress').style.width = '100%';
+    document.getElementById('step3').classList.remove('active', 'visible');
+    const res = catalog[key];
+    document.getElementById('res-family').innerText = res.family;
+    document.getElementById('res-image').src = res.img;
+    document.getElementById('res-pitch').innerText = res.pitch;
+    document.getElementById('res-desc').innerText = res.desc;
+    document.getElementById('resultStep').classList.add('active');
+    setTimeout(() => document.getElementById('resultStep').classList.add('visible'), 50);
+  }
+</script>
+</body>
+</html>
